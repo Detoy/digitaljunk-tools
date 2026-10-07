@@ -1,19 +1,52 @@
 name: automerge
-# Enables GitHub auto-merge (squash) on 'tool: <slug>' PRs. GitHub then merges
-# once the required 'check' status passes on main's branch protection.
+# 1) On 'tool: <slug>' PRs, enable GitHub auto-merge (squash).
+# 2) When 'check' succeeds on such a PR, merge it (if auto-merge hasn't already)
+#    and dispatch the deploy workflow. Merges done with GITHUB_TOKEN do NOT fire
+#    'push' workflows, so the explicit dispatch is what triggers the deploy.
 on:
   pull_request_target:
     types: [opened, reopened, edited, synchronize, ready_for_review]
+  workflow_run:
+    workflows: [check]
+    types: [completed]
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 jobs:
   enable:
-    if: startsWith(github.event.pull_request.title, 'tool:') && github.event.pull_request.draft == false
+    if: github.event_name == 'pull_request_target' && startsWith(github.event.pull_request.title, 'tool:') && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
-      - name: Enable auto-merge
-        env:
+      - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.html_url }}
         run: gh pr merge --auto --squash "$PR"
+  merge-and-deploy:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Find PR
+        id: pr
+        run: |
+          n=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.base.ref=="main")][0].number // empty')
+          [ -z "$n" ] && { echo "::notice::No PR for $SHA"; exit 0; }
+          title=$(gh pr view "$n" -R "$REPO" --json title -q .title)
+          case "$title" in tool:*) echo "n=$n" >> "$GITHUB_OUTPUT";; *) echo "::notice::'$title' is not a tool PR";; esac
+      - name: Merge and deploy
+        if: steps.pr.outputs.n != ''
+        run: |
+          n=${{ steps.pr.outputs.n }}
+          for i in $(seq 1 20); do
+            st=$(gh pr view "$n" -R "$REPO" --json state -q .state)
+            [ "$st" = MERGED ] && break
+            [ "$st" = CLOSED ] && { echo "::notice::PR closed"; exit 0; }
+            gh pr merge "$n" -R "$REPO" --squash --match-head-commit "$SHA" || true
+            sleep 15
+          done
+          [ "$(gh pr view "$n" -R "$REPO" --json state -q .state)" = MERGED ] || { echo "::error::PR #$n did not merge"; exit 1; }
+          gh workflow run deploy.yml -R "$REPO" --ref main
