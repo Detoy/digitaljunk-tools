@@ -1,0 +1,4 @@
+# Upload to the document root of edf.digitaljunk.in (replace its files)
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^(www\.)?edf\.digitaljunk\.in$ [NC]
+RewriteRule ^(.*)$ https://tools.digitaljunk.in/edf/ [R=301,L]

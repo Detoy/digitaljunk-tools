@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Digital Junk Tools</title>
+<meta name="description" content="Small, useful tools from Digital Junk Labs." />
+<meta property="og:title" content="Digital Junk Tools" />
+<meta property="og:image" content="https://tools.digitaljunk.in/edf/og.png" />
+<style>
+  :root { --bg:#f4efe6; --ink:#10302d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:72px 24px; }
+  h1 { font-size:2rem; letter-spacing:-.02em; margin:0 0 .25rem; }
+  .sub { opacity:.75; margin:0 0 3rem; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { border-top:1px solid rgba(16,48,45,.18); padding:1.25rem 0; }
+  li:last-child { border-bottom:1px solid rgba(16,48,45,.18); }
+  a { color:var(--ink); }
+  .name { font-weight:650; font-size:1.15rem; text-decoration:none; }
+  .name:hover { text-decoration:underline; }
+  .meta { font-size:.85rem; opacity:.7; margin-top:.35rem; }
+  footer { margin-top:3rem; font-size:.85rem; opacity:.6; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Digital Junk Tools</h1>
+  <p class="sub">Small, useful things from Digital Junk Labs, Ahmedabad.</p>
+  <ul id="tools"><li><a class="name" href="/edf/">EDF Pack Lab</a></li></ul>
+  <footer>&copy; Digital Junk</footer>
+</main>
+<script>
+fetch('/tools.json', { cache: 'no-cache' }).then(r => r.json()).then(tools => {
+  const ul = document.getElementById('tools'); ul.textContent = '';
+  for (const t of tools) {
+    const li = document.createElement('li');
+    const a = document.createElement('a'); a.className = 'name'; a.href = '/' + t.slug + '/'; a.textContent = t.name;
+    const p = document.createElement('div'); p.textContent = t.oneliner;
+    const m = document.createElement('div'); m.className = 'meta'; m.append(t.date);
+    if (t.x) { const x = document.createElement('a'); x.href = t.x; x.rel = 'noopener'; x.textContent = 'X post'; m.append(' · ', x); }
+    li.append(a, p, m); ul.append(li);
+  }
+}).catch(() => {});
+</script>
+</body>
+</html>

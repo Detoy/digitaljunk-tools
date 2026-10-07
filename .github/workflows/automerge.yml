@@ -1,0 +1,19 @@
+name: automerge
+# Enables GitHub auto-merge (squash) on 'tool: <slug>' PRs. GitHub then merges
+# once the required 'check' status passes on main's branch protection.
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  enable:
+    if: startsWith(github.event.pull_request.title, 'tool:') && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR"

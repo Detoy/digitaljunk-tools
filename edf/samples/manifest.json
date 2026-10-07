@@ -1,0 +1,10 @@
+{
+  "invoices": [
+    "INV-2026-104.pdf",
+    "INV-2026-105.pdf",
+    "INV-2026-106.pdf",
+    "INV-2026-107.pdf",
+    "INV-2026-108.pdf"
+  ],
+  "statement": "statement-oct-2026.csv"
+}
