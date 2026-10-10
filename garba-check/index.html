@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Garba Partner Check | Digital Junk Labs</title>
+<meta name="description" content="Score a garba-partner pitch and spot scam patterns before you send money. Runs in your browser. Shareable link, no signup." />
+<meta property="og:title" content="Garba Partner Check" />
+<meta property="og:description" content="Meme score + scam red flags for Gujarat Navratri partner pitches. Fully in your browser." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://tools.digitaljunk.in/garba-check/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Garba Partner Check" />
+<meta name="twitter:description" content="Score the pitch. Flag the scam. Share the result." />
+<style>
+  :root {
+    --bg:#f4efe6; --ink:#10302d; --line:rgba(16,48,45,.18);
+    --good:#1f6b4a; --warn:#9a5b12; --bad:#8b1e1e; --card:#fffdf8;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:640px; margin:0 auto; padding:48px 20px 80px; }
+  h1 { font-size:clamp(1.75rem,4vw,2.25rem); letter-spacing:-.02em; margin:0 0 .4rem; line-height:1.15; }
+  .sub { opacity:.78; margin:0 0 1.75rem; max-width:42ch; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1.1rem 1.15rem; margin:0 0 1rem; }
+  .q { font-weight:650; margin:0 0 .65rem; }
+  .opts { display:flex; flex-wrap:wrap; gap:.5rem; }
+  button.opt {
+    appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
+    border-radius:999px; padding:.45rem .9rem; font:inherit; cursor:pointer;
+  }
+  button.opt[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  button.opt:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .flags label { display:flex; gap:.65rem; align-items:flex-start; padding:.35rem 0; cursor:pointer; }
+  .flags input { margin-top:.3rem; }
+  .result { text-align:center; padding:1.4rem 1rem; }
+  .score { font-size:clamp(3rem,12vw,4.5rem); font-weight:750; letter-spacing:-.04em; line-height:1; margin:.2rem 0; }
+  .band { font-weight:650; margin:.35rem 0 .75rem; }
+  .band.safe { color:var(--good); }
+  .band.caution { color:var(--warn); }
+  .band.danger { color:var(--bad); }
+  .blurb { opacity:.85; margin:0 auto 1.1rem; max-width:40ch; }
+  .actions { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
+  .btn {
+    appearance:none; border:0; border-radius:10px; padding:.7rem 1.1rem; font:650 15px/1.2 inherit; cursor:pointer;
+  }
+  .btn.primary { background:var(--ink); color:var(--bg); }
+  .btn.ghost { background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .note { font-size:.9rem; opacity:.75; margin:1.25rem 0 0; max-width:46ch; }
+  .note strong { opacity:1; }
+  footer { margin-top:2.5rem; font-size:.85rem; opacity:.6; }
+  footer a { color:inherit; }
+  .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:var(--bg);
+    padding:.65rem 1rem; border-radius:10px; font-size:.9rem; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Garba partner check</h1>
+  <p class="sub">Score the pitch. Spot the scam pattern. Share the result link. Nothing leaves your browser.</p>
+
+  <section class="card" data-q="met">
+    <p class="q">1. How did you meet?</p>
+    <div class="opts" role="group" aria-label="How did you meet">
+      <button type="button" class="opt" data-v="friend" aria-pressed="false">Friend intro</button>
+      <button type="button" class="opt" data-v="event" aria-pressed="false">Same event / society</button>
+      <button type="button" class="opt" data-v="app" aria-pressed="false">App / random DM</button>
+      <button type="button" class="opt" data-v="unknown" aria-pressed="false">No idea, just a number</button>
+    </div>
+  </section>
+
+  <section class="card" data-q="video">
+    <p class="q">2. Will they do a quick video call before you meet?</p>
+    <div class="opts" role="group">
+      <button type="button" class="opt" data-v="yes" aria-pressed="false">Yes, easily</button>
+      <button type="button" class="opt" data-v="later" aria-pressed="false">Maybe later</button>
+      <button type="button" class="opt" data-v="no" aria-pressed="false">Refuse / excuses</button>
+    </div>
+  </section>
+
+  <section class="card" data-q="pay">
+    <p class="q">3. Are they asking for money before you meet?</p>
+    <div class="opts" role="group">
+      <button type="button" class="opt" data-v="none" aria-pressed="false">No</button>
+      <button type="button" class="opt" data-v="pass" aria-pressed="false">Only a pass / ticket</button>
+      <button type="button" class="opt" data-v="advance" aria-pressed="false">Advance / deposit / UPI now</button>
+    </div>
+  </section>
+
+  <section class="card" data-q="urgency">
+    <p class="q">4. How hard is the urgency push?</p>
+    <div class="opts" role="group">
+      <button type="button" class="opt" data-v="chill" aria-pressed="false">Chill, plan anytime</button>
+      <button type="button" class="opt" data-v="tonight" aria-pressed="false">Tonight only</button>
+      <button type="button" class="opt" data-v="last" aria-pressed="false">"Last pass" / FOMO hard sell</button>
+    </div>
+  </section>
+
+  <section class="card flags">
+    <p class="q">5. Tick any that already happened</p>
+    <label><input type="checkbox" data-flag="qr" /> Sent a QR / UPI ID before meeting</label>
+    <label><input type="checkbox" data-flag="otp" /> Asked for an OTP or banking info</label>
+    <label><input type="checkbox" data-flag="rent" /> Talked like a "rent-a-partner" service</label>
+    <label><input type="checkbox" data-flag="switch" /> Profile photo / story does not match the voice</label>
+    <label><input type="checkbox" data-flag="group" /> Pushes you into a group chat full of strangers</label>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <div class="meta" style="opacity:.7;font-size:.85rem;">Partner pitch score</div>
+    <div class="score" id="score">—</div>
+    <div class="band" id="band"></div>
+    <p class="blurb" id="blurb"></p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="share">Copy result link</button>
+      <button type="button" class="btn ghost" id="reset">Reset</button>
+    </div>
+    <p class="note"><strong>If money already left your account</strong>, stop the chat, keep screenshots, and report it at your local police station or cyber cell. This tool is a checklist, not legal advice.</p>
+  </section>
+
+  <footer><a href="../">Digital Junk Tools</a> · Ahmedabad · Navratri season</footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite">Link copied</div>
+<script>
+(function () {
+  const answers = { met: null, video: null, pay: null, urgency: null };
+  const flags = { qr: false, otp: false, rent: false, switch: false, group: false };
+
+  const weight = {
+    met: { friend: 28, event: 24, app: 10, unknown: 0 },
+    video: { yes: 24, later: 10, no: 0 },
+    pay: { none: 28, pass: 14, advance: 0 },
+    urgency: { chill: 20, tonight: 8, last: 0 }
+  };
+  const flagHit = { qr: 22, otp: 30, rent: 18, switch: 12, group: 10 };
+
+  function encodeState() {
+    const a = [answers.met, answers.video, answers.pay, answers.urgency].map(v => v || "").join("|");
+    const f = Object.keys(flags).filter(k => flags[k]).join(",");
+    return btoa(unescape(encodeURIComponent(a + "#" + f))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  }
+  function decodeState(raw) {
+    try {
+      const pad = raw.length % 4 === 0 ? "" : "=".repeat(4 - (raw.length % 4));
+      const s = decodeURIComponent(escape(atob(raw.replace(/-/g,"+").replace(/_/g,"/") + pad)));
+      const [aPart, fPart] = s.split("#");
+      const [met, video, pay, urgency] = (aPart || "").split("|");
+      return { met: met || null, video: video || null, pay: pay || null, urgency: urgency || null,
+        flags: (fPart || "").split(",").filter(Boolean) };
+    } catch (e) { return null; }
+  }
+
+  function score() {
+    if (!answers.met || !answers.video || !answers.pay || !answers.urgency) return null;
+    let s = 0;
+    s += weight.met[answers.met] || 0;
+    s += weight.video[answers.video] || 0;
+    s += weight.pay[answers.pay] || 0;
+    s += weight.urgency[answers.urgency] || 0;
+    for (const k of Object.keys(flags)) if (flags[k]) s -= flagHit[k] || 0;
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }
+
+  function bandFor(n) {
+    if (n >= 70) return { cls: "safe", label: "Looks alright", text: "Still verify in person. Pay for your own pass. Do not share OTP." };
+    if (n >= 40) return { cls: "caution", label: "Proceed careful", text: "Video-call first. No UPI before you meet. Meet in a public garba only." };
+    return { cls: "danger", label: "Walk away", text: "This pattern matches common partner / pass scams. Do not send money." };
+  }
+
+  function syncHash() {
+    const n = score();
+    if (n === null) { history.replaceState(null, "", location.pathname); return; }
+    history.replaceState(null, "", "#" + encodeState());
+  }
+
+  function render() {
+    const n = score();
+    const box = document.getElementById("result");
+    if (n === null) { box.hidden = true; syncHash(); return; }
+    const b = bandFor(n);
+    document.getElementById("score").textContent = String(n);
+    const band = document.getElementById("band");
+    band.className = "band " + b.cls;
+    band.textContent = b.label;
+    document.getElementById("blurb").textContent = b.text;
+    box.hidden = false;
+    syncHash();
+  }
+
+  function selectOpt(section, value) {
+    const q = section.getAttribute("data-q");
+    answers[q] = value;
+    section.querySelectorAll("button.opt").forEach(btn => {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-v") === value ? "true" : "false");
+    });
+    render();
+  }
+
+  document.querySelectorAll("section[data-q]").forEach(section => {
+    section.querySelectorAll("button.opt").forEach(btn => {
+      btn.addEventListener("click", () => selectOpt(section, btn.getAttribute("data-v")));
+    });
+  });
+  document.querySelectorAll(".flags input[data-flag]").forEach(inp => {
+    inp.addEventListener("change", () => {
+      flags[inp.getAttribute("data-flag")] = inp.checked;
+      render();
+    });
+  });
+
+  document.getElementById("reset").addEventListener("click", () => {
+    Object.keys(answers).forEach(k => answers[k] = null);
+    Object.keys(flags).forEach(k => flags[k] = false);
+    document.querySelectorAll("button.opt").forEach(b => b.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll(".flags input").forEach(i => { i.checked = false; });
+    render();
+  });
+
+  document.getElementById("share").addEventListener("click", async () => {
+    const url = location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (e) {
+      prompt("Copy this link", url);
+    }
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1600);
+  });
+
+  const hash = location.hash.replace(/^#/, "");
+  if (hash) {
+    const st = decodeState(hash);
+    if (st) {
+      ["met","video","pay","urgency"].forEach(k => {
+        if (st[k]) {
+          const section = document.querySelector('section[data-q="'+k+'"]');
+          if (section) selectOpt(section, st[k]);
+        }
+      });
+      (st.flags || []).forEach(f => {
+        if (f in flags) {
+          flags[f] = true;
+          const inp = document.querySelector('.flags input[data-flag="'+f+'"]');
+          if (inp) inp.checked = true;
+        }
+      });
+      render();
+    }
+  }
+})();
+</script>
+</body>
+</html>
